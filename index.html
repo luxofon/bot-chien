@@ -124,11 +124,11 @@ function tone(freq=660,duration=.055,type='sine',volume=.035){const ctx=getAudio
 function playButtonSound(){if(audioPrefs.sfx)tone(620,.045,'sine',.025)}
 function setAudioOption(key,value){audioPrefs[key]=!!value;localStorage.setItem('botChienAudioSettingsV1',JSON.stringify(audioPrefs));if(key==='sfx'&&value)tone(740,.07,'sine',.025);toast(value?'Đã bật âm thanh nút bấm':'Đã tắt âm thanh nút bấm')}
 function syncAudioControls(){const f=document.getElementById('sfxToggle');if(f)f.checked=!!audioPrefs.sfx}
-let youtubePlayer=null,youtubeApiLoading=false,youtubeReady=false,youtubePlaying=false;
+let youtubePlayer=null,youtubeApiLoading=false,youtubeReady=false,youtubePlaying=false,youtubeWantsPlay=false;
 function loadYoutubeApi(){if(window.YT&&window.YT.Player){createYoutubePlayer();return}if(youtubeApiLoading)return;youtubeApiLoading=true;window.onYouTubeIframeAPIReady=function(){createYoutubePlayer()};const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag)}
-function createYoutubePlayer(){if(youtubePlayer||!window.YT||!window.YT.Player)return;youtubePlayer=new YT.Player('youtubePlayer',{videoId:'cWAUaH7TiUE',playerVars:{playsinline:1,rel:0,origin:location.origin},events:{onReady:function(){youtubeReady=true;updateYoutubeButton()},onStateChange:function(e){youtubePlaying=e.data===YT.PlayerState.PLAYING;updateYoutubeButton()},onError:function(){toast('Video không phát được trong khung nhúng. Hãy thử mở YouTube trực tiếp.')}}})}
+function createYoutubePlayer(){if(youtubePlayer||!window.YT||!window.YT.Player)return;youtubePlayer=new YT.Player('youtubePlayer',{videoId:'cWAUaH7TiUE',playerVars:{playsinline:1,rel:0,origin:location.origin},events:{onReady:function(){youtubeReady=true;updateYoutubeButton();if(youtubeWantsPlay){youtubeWantsPlay=false;youtubePlayer.playVideo()}},onStateChange:function(e){youtubePlaying=e.data===YT.PlayerState.PLAYING;updateYoutubeButton()},onError:function(){toast('Video không phát được trong khung nhúng. Hãy thử mở YouTube trực tiếp.')}}})}
 function updateYoutubeButton(){const b=document.getElementById('youtubePlayBtn');if(b)b.textContent=youtubePlaying?'⏸️ Tạm dừng nhạc':'▶️ Phát nhạc'}
-function toggleYoutubeMusic(){if(!youtubePlayer){loadYoutubeApi();toast('Đang tải trình phát YouTube… nhấn Phát lại sau giây lát.');return}if(!youtubeReady){toast('Đang tải video, chờ một chút nha.');return}try{if(youtubePlaying)youtubePlayer.pauseVideo();else youtubePlayer.playVideo()}catch(e){toast('Không phát được. Thử mở video trực tiếp trên YouTube.')}}
+function toggleYoutubeMusic(){if(!youtubePlayer){youtubeWantsPlay=true;loadYoutubeApi();toast('Đang tải bài nhạc…');return}if(!youtubeReady){toast('Đang tải video, chờ một chút nha.');return}try{if(youtubePlaying)youtubePlayer.pauseVideo();else youtubePlayer.playVideo()}catch(e){toast('Không phát được. Thử mở video trực tiếp trên YouTube.')}}
 function stopYoutubeMusic(){if(youtubePlayer&&youtubeReady){youtubePlayer.pauseVideo();youtubePlaying=false;updateYoutubeButton()}else toast('Nhạc đang tạm dừng.')}
 function GenUIOpenYoutube(){window.open('https://www.youtube.com/watch?v=cWAUaH7TiUE','_blank','noopener')}
 function saveNow(){save();toast('Đã lưu tiến trình trên thiết bị này!')}
@@ -178,6 +178,5 @@ function loadSaveCode(){const box=document.getElementById('saveCodeBox');if(!box
 function clearSaveCode(){const box=document.getElementById('saveCodeBox');if(box)box.value='';toast('Đã xoá ô mã save.')}
 function importSave(event){const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{let raw=String(reader.result||'');const marker='--- SAVE DATA ---';if(raw.includes(marker))raw=raw.slice(raw.indexOf(marker)+marker.length).trim();const data=JSON.parse(raw);restoreSaveData(data)}catch(e){toast('File save không hợp lệ.')}event.target.value=''};reader.readAsText(file)}
 renderAll();
-loadYoutubeApi();
 </script>
 </body></html>
