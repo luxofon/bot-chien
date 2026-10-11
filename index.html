@@ -188,6 +188,57 @@ main{flex:1 1 auto;min-height:0;width:100%}
 .topping-option .check{position:absolute;top:7px;right:8px;float:none;font-size:13px;font-weight:1000;color:var(--green)}
 @media(max-width:600px){.stall-scene{height:235px}.scene-cart{left:1%;top:49px;transform:perspective(700px) rotateY(-9deg) rotateZ(-1deg) scale(.73)}.scene-customer{right:3%;transform:scale(.84);transform-origin:bottom right}.scene-sign{top:10px;left:9px;font-size:10px}.scene-sign small{font-size:6px}.topping-option{min-height:127px;padding:10px 4px 8px}.ingredient-orb{width:51px;height:51px;font-size:26px}.wait-copy strong{font-size:12px}}
 
+
+/* Wide counter layout: cart in the center, customer in front, toppings around the pan */
+@media(min-width:900px){
+ .app{max-width:1500px}
+ #cook .cook-panel{padding:24px}
+ #cook .order-layout{display:block}
+ #cook .cook-left{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+ #cook .stall-scene{height:290px;margin-bottom:0}
+ #cook .scene-cart{left:23%;top:44px;transform:perspective(700px) rotateY(-9deg) rotateZ(-1deg) scale(1.02);transform-origin:top left}
+ #cook .scene-customer{right:25%;bottom:29px;transform:scale(1.04);transform-origin:bottom center;z-index:12}
+ #cook .scene-sign{left:7%;top:16px}
+ #cook .customer-wait{max-width:100%;margin:0}
+ #cook .customer{margin:0}
+ #cook .order-ticket{margin:0}
+ #cook .fry-station{display:block;padding:18px 20px}
+ #cook .pan-scene{display:grid;grid-template-columns:minmax(180px,1fr) 230px minmax(180px,1fr);grid-template-rows:auto auto 1fr;column-gap:18px;align-items:start;height:auto;min-height:290px;margin:8px 0 12px;padding:8px 0;background:radial-gradient(ellipse at 50% 48%,#f7bf7555 0,#fce6c455 30%,transparent 65%)}
+ #cook .pan-scene>.pan-handle{position:absolute;left:calc(50% + 48px);top:130px;width:100px;z-index:1}
+ #cook .pan-scene>.pan{position:absolute;left:50%;top:73px;transform:translateX(-50%);width:218px;height:158px;z-index:3}
+ #cook .pan-scene>.flame-row{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:2}
+ #cook .pan-scene>.pan-sizzle{z-index:4}
+ #cook .pan-scene>.pan-side-title{grid-column:1;grid-row:1;margin:0 0 7px;font-size:15px}
+ #cook .pan-scene>.drink-side-title{grid-column:3;grid-row:1;margin:0 0 7px;font-size:15px}
+ #cook .pan-scene>.drink-side-copy{grid-column:3;grid-row:2;margin:0 0 7px;font-size:11px;color:var(--muted);line-height:1.4}
+ #cook #toppingOptions{grid-column:1;grid-row:2 / span 2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-self:stretch}
+ #cook #drinkOptions{grid-column:3;grid-row:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-content:start}
+ #cook .topping-option{min-height:112px;padding:7px 3px;border-radius:17px}
+ #cook .topping-option.selected{padding:6px 2px}
+ #cook .ingredient-orb{width:43px;height:43px;font-size:23px}
+ #cook .topping-name{font-size:10px;min-height:24px}
+ #cook .topping-option small{font-size:9px}
+ #cook .stock-label{font-size:8px}
+ #cook .topping-option .check{top:4px;right:5px;font-size:11px}
+ #cook .pan-ingredients{grid-template-columns:1fr 1fr}
+ #cook .pan-ingredients button{min-height:45px}
+ #cook .cook-right{display:grid;grid-template-columns:220px 1fr;align-items:center;gap:16px;margin-top:12px}
+ #cook .dish{min-height:190px}
+ #cook .dish .plate{width:145px;height:145px;font-size:58px}
+ #cook .cook-right>.notice{margin:0}
+ #cook .cook-right>button{grid-column:2}
+ #cook .pricebar{margin:10px 0}
+}
+@media(max-width:899px){
+ #cook .pan-scene{display:flex;flex-direction:column;height:auto;min-height:0;gap:12px;padding:12px 0}
+ #cook .pan-scene>.pan-handle,#cook .pan-scene>.pan,#cook .pan-scene>.flame-row{position:relative;left:auto;top:auto;bottom:auto;transform:none}
+ #cook .pan-scene>.pan{flex:none}
+ #cook .pan-scene>.pan-handle{position:absolute;left:calc(50% + 42px);top:145px;width:85px}
+ #cook .pan-scene>.flame-row{position:absolute;bottom:0;left:50%;transform:translateX(-50%)}
+ #cook .pan-scene>.pan-side-title,#cook .pan-scene>.drink-side-title,#cook .pan-scene>.drink-side-copy{display:none}
+ #cook #toppingOptions,#cook #drinkOptions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+}
+
 </style>
 </head>
 <body>
@@ -293,7 +344,18 @@ function startCustomerWaitTimer(){
  if(!customerWaitInterval){customerWaitInterval=setInterval(()=>{if(!document.getElementById('cook')?.classList.contains('active'))return;if(customerWaitRemaining>0)customerWaitRemaining--;update()},1000)}
 }
 
-function renderCook(){const c=currentCustomer();document.getElementById('customerFace').textContent=c.face;document.getElementById('customerName').textContent=c.name;document.getElementById('customerQuote').textContent=c.quote;document.getElementById('orderSummary').textContent=(c.dish==='nui'?'Nui chiên':'Bột chiên')+' + '+toppingNames(c.order)+(c.drink?' + '+drinkMenu[c.drink].name:'');document.getElementById('orderHint').textContent='Khách muốn: '+(c.dish==='nui'?'nui chiên':'bột chiên')+' + '+toppingNames(c.order)+(c.drink?' + '+drinkMenu[c.drink].name:'')+'. Làm sai vẫn giao được; khách tự quyết định mức đánh giá theo lỗi. Hoàn thành mini game trước khi giao.';document.getElementById('customerCount').textContent='Khách '+Math.min(s.dayServed+1,dayTarget())+'/'+dayTarget();document.getElementById('cookTitle').textContent=s.dayServed>=dayTarget()?'Hôm nay đã phục vụ đủ khách!':'Đọc đơn của '+c.name;document.getElementById('customerMood').textContent=(c.age||'Khách hôm nay')+' · Đang chờ món';startCustomerWaitTimer();const opts=[['egg','🥚','Trứng gà','+3.000đ'],['scallion','🌿','Hành lá','+1.000đ'],['sausage','🌭','Xúc xích','+5.000đ'],['cheese','🧀','Phô mai','+6.000đ'],['chili','🌶️','Ớt sa tế','+1.000đ'],['mayo','🥫','Mayonnaise','+2.000đ'],['pickles','🥒','Củ cải muối','+1.500đ'],['porkfloss','🥓','Chà bông','+7.000đ']];document.getElementById('toppingOptions').innerHTML=opts.map(([id,em,n,d])=>'<button class="option topping-option '+(selected[id]?'selected':'')+'" onclick="toggleTopping(\''+id+'\')"><span class="ingredient-orb orb-'+id+'">'+em+'</span><span class="topping-name">'+n+'</span><small>'+d+'</small><span class="stock-label">Kho: '+s.stock[id]+'</span><span class="check">'+(selected[id]?'✓':'＋')+'</span></button>').join('');document.getElementById('toppingVisual').textContent=(selected.egg?'🥚':'')+(selected.scallion?'🌿':'')+(selected.sausage?'🌭':'')+(selected.cheese?'🧀':'')+(selected.chili?'🌶️':'')+(selected.mayo?'🥫':'')+(selected.pickles?'🥒':'')+(selected.porkfloss?'🥓':'');renderDrinkOptions();document.getElementById('dishPrice').textContent=fmt(price()+drinkSale());document.getElementById('dishCost').textContent='Giá vốn: '+fmt(cost()+drinkCost());const miss=missingStock();const chosen=Object.keys(selected).filter(k=>selected[k]);const exact=chosen.length===c.order.length&&c.order.every(k=>selected[k])&&(fryGame.baseType||'bot')===(c.dish||'bot')&&(!c.drink||selectedDrink===c.drink);document.getElementById('serveBtn').disabled=s.dayServed>=dayTarget()||miss.length>0;let message=s.dayServed>=dayTarget()?'<div class="notice">🌇 Bạn đã hoàn thành lượt bán hôm nay. Hãy tổng kết ngày!</div>':miss.length?'<div class="notice warn">Thiếu '+miss.map(x=>ingredients[x].name).join(', ')+'. Vào chợ nhập thêm nhé.</div>':exact?'<div class="notice">✓ Topping khớp đơn. Chiên xong là giao thôi!</div>':'<div class="notice warn">😈 Đang làm sai đơn! Vẫn giao được; mức đánh giá tuỳ tính cách khách và mức độ sai. Hoặc bấm thùng rác để làm lại.</div>';document.getElementById('cookMessage').innerHTML=message;if(s.dayServed>=dayTarget())document.getElementById('cookMessage').innerHTML+='<button class="primary wide" onclick="go(\'endday\')">Xem tổng kết ngày →</button>';if(!fryGame.started)resetFrying();else updateServeButton()}
+function renderCook(){const c=currentCustomer();document.getElementById('customerFace').textContent=c.face;document.getElementById('customerName').textContent=c.name;document.getElementById('customerQuote').textContent=c.quote;document.getElementById('orderSummary').textContent=(c.dish==='nui'?'Nui chiên':'Bột chiên')+' + '+toppingNames(c.order)+(c.drink?' + '+drinkMenu[c.drink].name:'');document.getElementById('orderHint').textContent='Khách muốn: '+(c.dish==='nui'?'nui chiên':'bột chiên')+' + '+toppingNames(c.order)+(c.drink?' + '+drinkMenu[c.drink].name:'')+'. Làm sai vẫn giao được; khách tự quyết định mức đánh giá theo lỗi. Hoàn thành mini game trước khi giao.';document.getElementById('customerCount').textContent='Khách '+Math.min(s.dayServed+1,dayTarget())+'/'+dayTarget();document.getElementById('cookTitle').textContent=s.dayServed>=dayTarget()?'Hôm nay đã phục vụ đủ khách!':'Đọc đơn của '+c.name;document.getElementById('customerMood').textContent=(c.age||'Khách hôm nay')+' · Đang chờ món';startCustomerWaitTimer();
+const panScene=document.querySelector('#cook .pan-scene');
+if(panScene){
+ const topTitle=document.querySelector('#cook h3:not([style])');
+ const toppingBox=document.getElementById('toppingOptions');
+ const drinkTitle=document.querySelector('#cook h3[style]');
+ const drinkCopy=drinkTitle&&drinkTitle.nextElementSibling;
+ const drinkBox=document.getElementById('drinkOptions');
+ if(topTitle&&toppingBox&&topTitle.parentElement!==panScene){topTitle.classList.add('pan-side-title');panScene.insertBefore(topTitle,panScene.firstChild);panScene.insertBefore(toppingBox,panScene.children[1]||null)}
+ if(drinkTitle&&drinkBox&&drinkTitle.parentElement!==panScene){drinkTitle.classList.add('drink-side-title');drinkTitle.removeAttribute('style');panScene.appendChild(drinkTitle);if(drinkCopy){drinkCopy.classList.add('drink-side-copy');panScene.appendChild(drinkCopy)}panScene.appendChild(drinkBox)}
+}
+const opts=[['egg','🥚','Trứng gà','+3.000đ'],['scallion','🌿','Hành lá','+1.000đ'],['sausage','🌭','Xúc xích','+5.000đ'],['cheese','🧀','Phô mai','+6.000đ'],['chili','🌶️','Ớt sa tế','+1.000đ'],['mayo','🥫','Mayonnaise','+2.000đ'],['pickles','🥒','Củ cải muối','+1.500đ'],['porkfloss','🥓','Chà bông','+7.000đ']];document.getElementById('toppingOptions').innerHTML=opts.map(([id,em,n,d])=>'<button class="option topping-option '+(selected[id]?'selected':'')+'" onclick="toggleTopping(\''+id+'\')"><span class="ingredient-orb orb-'+id+'">'+em+'</span><span class="topping-name">'+n+'</span><small>'+d+'</small><span class="stock-label">Kho: '+s.stock[id]+'</span><span class="check">'+(selected[id]?'✓':'＋')+'</span></button>').join('');document.getElementById('toppingVisual').textContent=(selected.egg?'🥚':'')+(selected.scallion?'🌿':'')+(selected.sausage?'🌭':'')+(selected.cheese?'🧀':'')+(selected.chili?'🌶️':'')+(selected.mayo?'🥫':'')+(selected.pickles?'🥒':'')+(selected.porkfloss?'🥓':'');renderDrinkOptions();document.getElementById('dishPrice').textContent=fmt(price()+drinkSale());document.getElementById('dishCost').textContent='Giá vốn: '+fmt(cost()+drinkCost());const miss=missingStock();const chosen=Object.keys(selected).filter(k=>selected[k]);const exact=chosen.length===c.order.length&&c.order.every(k=>selected[k])&&(fryGame.baseType||'bot')===(c.dish||'bot')&&(!c.drink||selectedDrink===c.drink);document.getElementById('serveBtn').disabled=s.dayServed>=dayTarget()||miss.length>0;let message=s.dayServed>=dayTarget()?'<div class="notice">🌇 Bạn đã hoàn thành lượt bán hôm nay. Hãy tổng kết ngày!</div>':miss.length?'<div class="notice warn">Thiếu '+miss.map(x=>ingredients[x].name).join(', ')+'. Vào chợ nhập thêm nhé.</div>':exact?'<div class="notice">✓ Topping khớp đơn. Chiên xong là giao thôi!</div>':'<div class="notice warn">😈 Đang làm sai đơn! Vẫn giao được; mức đánh giá tuỳ tính cách khách và mức độ sai. Hoặc bấm thùng rác để làm lại.</div>';document.getElementById('cookMessage').innerHTML=message;if(s.dayServed>=dayTarget())document.getElementById('cookMessage').innerHTML+='<button class="primary wide" onclick="go(\'endday\')">Xem tổng kết ngày →</button>';if(!fryGame.started)resetFrying();else updateServeButton()}
 function toggleTopping(id){selected[id]=!selected[id];resetFryState();renderCook()}
 function dayTarget(){return Math.max(2,(s.upgrades.includes('stove')?4:3)+(dailyEvent().extraCustomers||0)+(currentLocation().extraCustomers||0))}
 function missingStock(){let a=[];const baseKey=fryGame.baseType==='nui'?'nui':'flour';if(s.stock[baseKey]<1)a.push(baseKey);Object.keys(selected).forEach(id=>{if(selected[id]&&s.stock[id]<1)a.push(id)});if(selectedDrink&&s.stock[selectedDrink]<1)a.push(selectedDrink);return a}
